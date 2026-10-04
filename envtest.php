@@ -11,4 +11,4 @@ if ($u) {
 echo "MYSQLHOST: " . (getenv('MYSQLHOST') ?: '(empty)') . "\n";
 echo "Server: " . ($_SERVER['SERVER_SOFTWARE'] ?? '') . "\n";
 $f = file_get_contents(__DIR__ . '/config/db.php');
-echo "db.php is NEW code: " . (strpos($f, '| Host:') !== false ? 'YES' : 'NO') . "\n";
+echo "db.php is NEW code: " . (strpos($f, '| Host:') !== false ? 'YES' : 'NO') . "\n";echo "ENV KEYS: " . implode(", ", array_keys(getenv())) . "\n";
