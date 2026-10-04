@@ -1,5 +1,4 @@
-```php
-<?php
+﻿<?php
 /**
  * Database connection (PDO / MySQL)
  * Works with Railway MYSQL_URL and local XAMPP MySQL.
@@ -13,9 +12,15 @@ if ($databaseUrl) {
 
     $DB_HOST = $db['host'] ?? '';
     $DB_PORT = $db['port'] ?? 3306;
-    $DB_USER = $db['user'] ?? '';
-    $DB_PASS = $db['pass'] ?? '';
+    $DB_USER = isset($db['user']) ? urldecode($db['user']) : '';
+    $DB_PASS = isset($db['pass']) ? urldecode($db['pass']) : '';
     $DB_NAME = isset($db['path']) ? ltrim($db['path'], '/') : '';
+
+    // Debug (temporary)
+    error_log("DB_HOST: $DB_HOST");
+    error_log("DB_PORT: $DB_PORT");
+    error_log("DB_NAME: $DB_NAME");
+    error_log("DB_USER: $DB_USER");
 
     try {
         $pdo = new PDO(
@@ -28,12 +33,12 @@ if ($databaseUrl) {
             ]
         );
     } catch (PDOException $e) {
-        die('Database connection failed: ' . $e->getMessage());
+        die('Database connection failed: ' . $e->getMessage() . ' | Host: ' . $DB_HOST . ' | Port: ' . $DB_PORT . ' | DB: ' . $DB_NAME);
     }
 
 } else {
     // Local XAMPP MySQL
-    $DB_HOST = 'localhost';
+    $DB_HOST = '127.0.0.1';
     $DB_PORT = 3306;
     $DB_NAME = 'iba_appointment_system';
     $DB_USER = 'root';
@@ -53,5 +58,3 @@ if ($databaseUrl) {
         die('Database connection failed: ' . $e->getMessage());
     }
 }
-?>
-```
