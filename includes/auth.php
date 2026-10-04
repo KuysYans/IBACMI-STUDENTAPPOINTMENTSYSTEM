@@ -1,10 +1,12 @@
 <?php
+
 /**
  * Session / auth helpers.
- * Include this AFTER config/db.php has already been required
- * (it needs $pdo for login_user()).
+ * Include this AFTER config/db.php has already been required.
  */
+
 if (session_status() === PHP_SESSION_NONE) {
+    ob_start();
     session_start();
 }
 
@@ -15,28 +17,31 @@ function current_user(): ?array
 }
 
 /**
- * Guards a page to one or more roles. Redirects to the landing
- * page (with a friendly message) if not logged in / wrong role.
- * $homePath is the relative path back to index.php from wherever
- * this is called (e.g. '../index.php' from /student or /staff).
+ * Guards a page to one or more roles.
  */
 function require_role($roles, string $homePath = 'index.php'): array
 {
     if (!is_array($roles)) {
         $roles = [$roles];
     }
+
     $user = current_user();
+
     if (!$user || !in_array($user['role'], $roles, true)) {
         header('Location: ' . $homePath . '?auth=required');
         exit;
     }
+
     return $user;
 }
 
-/** Attempts a login; returns true/false. Stores user (minus password) in session. */
+/** Attempts a login. */
 function login_user(PDO $pdo, string $email, string $password, string $role): bool
 {
-    $stmt = $pdo->prepare('SELECT * FROM users WHERE email = ? AND role = ? LIMIT 1');
+    $stmt = $pdo->prepare(
+        'SELECT * FROM users WHERE email = ? AND role = ? LIMIT 1'
+    );
+
     $stmt->execute([$email, $role]);
     $u = $stmt->fetch();
 
@@ -45,6 +50,7 @@ function login_user(PDO $pdo, string $email, string $password, string $role): bo
         $_SESSION['user'] = $u;
         return true;
     }
+
     return false;
 }
 
