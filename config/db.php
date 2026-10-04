@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 $databaseUrl = getenv('DATABASE_URL');
 
