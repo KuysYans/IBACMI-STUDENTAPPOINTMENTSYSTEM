@@ -210,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .split-media{ display:block; }
   }
 </style>
-  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="icon" type="image/png" href="assets/logo.png?v=2">
 </head>
 <body>
   <div class="split">
