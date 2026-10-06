@@ -1524,6 +1524,7 @@ footer {
 
 </style>
 
+  <link rel="icon" type="image/png" href="assets/logo.png">
 </head>
 
 <body>

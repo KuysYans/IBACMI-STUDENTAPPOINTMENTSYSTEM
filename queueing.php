@@ -167,6 +167,7 @@ $only = in_array($only, ['registrar', 'cashier'], true) ? $only : '';
   footer .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--serving); margin-right: 6px; }
   footer .dot.off { background: #ef4444; }
 </style>
+  <link rel="icon" type="image/png" href="assets/logo.png">
 </head>
 <body>
 
