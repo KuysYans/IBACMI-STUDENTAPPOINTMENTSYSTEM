@@ -154,6 +154,12 @@ $only = in_array($only, ['registrar', 'cashier'], true) ? $only : '';
 
   .stats { display: flex; justify-content: space-between; color: var(--muted); font-size: clamp(12px, 1.3vw, 20px); }
   .stats b { color: var(--text); }
+  .sound-btn { margin-top: 6px; background: transparent; color: var(--text); border: 2px solid var(--muted);
+               border-radius: 999px; padding: 6px 16px; font: inherit; font-weight: 700; cursor: pointer;
+               font-size: clamp(12px, 1.3vw, 18px); }
+  .sound-btn.on { border-color: var(--serving); color: var(--serving); }
+  .sound-btn:not(.on) { animation: pulse 1.6s infinite; border-color: var(--next); color: var(--next); }
+  @keyframes pulse { 50% { opacity: .45; } }
   footer { text-align: center; color: var(--muted); font-size: clamp(11px, 1.1vw, 16px); }
   footer .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--serving); margin-right: 6px; }
   footer .dot.off { background: #ef4444; }
@@ -163,7 +169,9 @@ $only = in_array($only, ['registrar', 'cashier'], true) ? $only : '';
 
 <header>
   <h1>IBA College of Mindanao · Queue</h1>
-  <div class="clock"><b id="clock">--:--:--</b><span id="date"></span></div>
+  <div class="clock"><b id="clock">--:--:--</b><span id="date"></span><br>
+    <button class="sound-btn" id="soundBtn" type="button">🔇 Click to enable voice</button>
+  </div>
 </header>
 
 <div class="boards" id="boards">
@@ -187,6 +195,91 @@ const lastServing = {};
 
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
+// ---------------- Voice announcements ----------------
+// Browsers block sound until someone clicks the page once, so the TV
+// needs one click on the "enable voice" button after opening the board.
+let soundOn = false, audioCtx = null, voice = null;
+const annQueue = []; let annBusy = false;
+const WORDS = ['zero','one','two','three','four','five','six','seven','eight','nine'];
+
+function pickVoice() {
+  if (!('speechSynthesis' in window)) return null;
+  const vs = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang));
+  const prefs = [/aria/i, /jenny/i, /zira/i, /samantha/i, /google uk english female/i,
+                 /google us english/i, /susan/i, /hazel/i, /karen/i, /tessa/i, /female/i];
+  for (const p of prefs) { const v = vs.find(x => p.test(x.name)); if (v) return v; }
+  return vs[0] || null;
+}
+if ('speechSynthesis' in window) {
+  voice = pickVoice();
+  speechSynthesis.onvoiceschanged = () => { voice = pickVoice(); };
+}
+
+function chime() {
+  if (!audioCtx) return;
+  const t = audioCtx.currentTime;
+  [[880, 0], [660, 0.35]].forEach(([f, d]) => {
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = 'sine'; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t + d);
+    g.gain.exponentialRampToValueAtTime(0.35, t + d + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.6);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(t + d); o.stop(t + d + 0.65);
+  });
+}
+
+function speak(text, times, done) {
+  if (!('speechSynthesis' in window)) { done(); return; }
+  let n = 0, finished = false;
+  const finish = () => { if (!finished) { finished = true; done(); } };
+  const watchdog = setTimeout(finish, 20000);
+  const say = () => {
+    const u = new SpeechSynthesisUtterance(text);
+    if (voice) { u.voice = voice; u.lang = voice.lang; } else { u.lang = 'en-US'; }
+    u.rate = 0.9; u.pitch = 1.05; u.volume = 1;
+    let ended = false;
+    u.onend = u.onerror = () => {
+      if (ended) return; ended = true;
+      n++;
+      if (n < times) setTimeout(say, 800); else { clearTimeout(watchdog); finish(); }
+    };
+    speechSynthesis.speak(u);
+  };
+  say();
+}
+
+function runAnnouncements() {
+  if (annBusy || !annQueue.length) return;
+  annBusy = true;
+  const { office, code } = annQueue.shift();
+  const digits = String(code).replace(/\D/g, '').split('').map(d => WORDS[+d]).join(', ');
+  const text = 'I B A, ' + digits + '. Your turn. Please proceed to the ' + office + ' window.';
+  chime();
+  setTimeout(() => speak(text, 2, () => { annBusy = false; runAnnouncements(); }), 900);
+}
+
+function announce(office, code) {
+  if (!soundOn || !code) return;
+  annQueue.push({ office: office, code: code });
+  runAnnouncements();
+}
+
+document.getElementById('soundBtn').addEventListener('click', function () {
+  soundOn = !soundOn;
+  if (soundOn) {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    this.textContent = '🔊 Voice on'; this.classList.add('on');
+    chime();
+    setTimeout(() => speak('Queue announcements are now on.', 1, () => {}), 900);
+  } else {
+    speechSynthesis.cancel(); annQueue.length = 0; annBusy = false;
+    this.textContent = '🔇 Click to enable voice'; this.classList.remove('on');
+  }
+});
+// -----------------------------------------------------
+
 function render(office, q) {
   const now  = document.getElementById(office + '-now');
   const next = document.getElementById(office + '-next');
@@ -196,6 +289,7 @@ function render(office, q) {
     now.innerHTML = '<div class="label">NOW SERVING</div><div class="code">' + esc(q.serving) + '</div>';
     if (lastServing[office] !== undefined && lastServing[office] !== q.serving) {
       now.classList.add('flash');
+      announce(office, q.serving);
     }
   } else {
     now.className = 'now empty';
