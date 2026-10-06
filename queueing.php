@@ -22,6 +22,9 @@ date_default_timezone_set('Asia/Manila');
 
 const QUEUE_MAX = 20;
 
+// Optional: queueing.php?date=2026-10-06 shows that day's queue (handy for testing).
+$dateParam = (isset($_GET['date']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['date'])) ? $_GET['date'] : '';
+
 function build_office_queue(PDO $pdo, string $office, string $date): array
 {
     $stmt = $pdo->prepare(
@@ -83,7 +86,7 @@ if (isset($_GET['ajax'])) {
     header('Content-Type: application/json; charset=utf-8');
     header('Cache-Control: no-store');
 
-    $date = date('Y-m-d');
+    $date = $dateParam ?: date('Y-m-d');
     echo json_encode([
         'date'      => $date,
         'updated'   => date('g:i:s A'),
@@ -191,6 +194,7 @@ $only = in_array($only, ['registrar', 'cashier'], true) ? $only : '';
 <script>
 const OFFICES = <?php echo json_encode($only ? [$only] : ['registrar', 'cashier']); ?>;
 const POLL_MS = 3000;
+const DATE_Q = <?php echo json_encode($dateParam ? '&date=' . $dateParam : ''); ?>;
 const lastServing = {};
 
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -315,7 +319,7 @@ function render(office, q) {
 async function poll() {
   const dot = document.getElementById('dot'), st = document.getElementById('status');
   try {
-    const res  = await fetch('queueing.php?ajax=1&t=' + Date.now(), { cache: 'no-store' });
+    const res  = await fetch('queueing.php?ajax=1' + DATE_Q + '&t=' + Date.now(), { cache: 'no-store' });
     const data = await res.json();
     OFFICES.forEach(o => render(o, data[o]));
     document.getElementById('date').textContent = data.date;
