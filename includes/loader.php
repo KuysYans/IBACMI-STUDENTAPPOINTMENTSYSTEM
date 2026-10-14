@@ -1,6 +1,6 @@
 <?php
 /**
- * Page loading screen (maroon overlay + zooming school logo).
+ * Page loading screen (maroon overlay + logo in white circle + spinning ring).
  * Include this RIGHT AFTER the opening <body> tag of every page.
  * Works on XAMPP (/iba-system/...) and Railway (site root) because the
  * logo URL is computed from the real folder location.
@@ -12,27 +12,49 @@ $__base = ($__doc && strncasecmp($__root, $__doc, strlen($__doc)) === 0)
 $__logo = htmlspecialchars($__base . '/assets/logo.png', ENT_QUOTES);
 ?>
 <style>
-  .ibl-loader{position:fixed;inset:0;z-index:2147483647;background:#9E2A2E;
-    display:flex;align-items:center;justify-content:center;
-    opacity:1;visibility:visible;transition:opacity .45s ease,visibility .45s ease}
+  .ibl-loader{position:fixed;inset:0;z-index:2147483647;
+    background:radial-gradient(circle at 50% 45%,#B5393D 0%,#9E2A2E 55%,#7A1E22 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;
+    opacity:1;visibility:visible;transition:opacity .5s ease,visibility .5s ease}
   .ibl-loader.ibl-hide{opacity:0;visibility:hidden;pointer-events:none}
-  .ibl-wrap{position:relative;width:140px;height:140px;display:flex;align-items:center;justify-content:center}
-  .ibl-ring{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(255,255,255,.55);
-    animation:ibl-ring 1.4s ease-in-out infinite}
-  .ibl-ring.ibl-ring2{animation-delay:.7s}
-  .ibl-logo{width:84px;height:84px;object-fit:contain;
-    animation:ibl-zoom 1.4s ease-in-out infinite;will-change:transform}
-  @keyframes ibl-zoom{0%{transform:scale(.55)}55%{transform:scale(1.08)}100%{transform:scale(.55)}}
-  @keyframes ibl-ring{0%{transform:scale(.85);opacity:.9}100%{transform:scale(1.45);opacity:0}}
-  @media (prefers-reduced-motion:reduce){.ibl-logo,.ibl-ring{animation:none}}
+
+  .ibl-wrap{position:relative;width:150px;height:150px;display:flex;align-items:center;justify-content:center}
+
+  /* spinning arc */
+  .ibl-spin{position:absolute;inset:0;border-radius:50%;
+    border:3px solid rgba(255,255,255,.18);border-top-color:#fff;
+    animation:ibl-spin 1.1s linear infinite}
+
+  /* white circle holding the logo */
+  .ibl-disc{width:112px;height:112px;border-radius:50%;background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 0 0 rgba(255,255,255,.35),0 8px 24px rgba(0,0,0,.25);
+    animation:ibl-breathe 2s ease-in-out infinite;will-change:transform}
+  .ibl-logo{width:78px;height:78px;object-fit:contain}
+
+  /* thin progress bar */
+  .ibl-bar{width:140px;height:3px;border-radius:3px;background:rgba(255,255,255,.22);overflow:hidden}
+  .ibl-bar::before{content:"";display:block;height:100%;width:40%;border-radius:3px;background:#fff;
+    animation:ibl-bar 1.3s ease-in-out infinite}
+
+  @keyframes ibl-spin{to{transform:rotate(360deg)}}
+  @keyframes ibl-breathe{
+    0%,100%{transform:scale(.96);box-shadow:0 0 0 0 rgba(255,255,255,.30),0 8px 24px rgba(0,0,0,.25)}
+    50%{transform:scale(1.04);box-shadow:0 0 0 14px rgba(255,255,255,0),0 8px 24px rgba(0,0,0,.25)}}
+  @keyframes ibl-bar{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}
+
+  @media (prefers-reduced-motion:reduce){.ibl-spin,.ibl-disc,.ibl-bar::before{animation:none}}
 </style>
 <noscript><style>.ibl-loader{display:none!important}</style></noscript>
 
 <div class="ibl-loader" id="iblLoader" aria-hidden="true">
   <div class="ibl-wrap">
-    <span class="ibl-ring"></span><span class="ibl-ring ibl-ring2"></span>
-    <img class="ibl-logo" src="<?= $__logo ?>" alt="IBA College of Mindanao">
+    <span class="ibl-spin"></span>
+    <div class="ibl-disc">
+      <img class="ibl-logo" src="<?= $__logo ?>" alt="IBA College of Mindanao">
+    </div>
   </div>
+  <div class="ibl-bar"></div>
 </div>
 
 <script>
