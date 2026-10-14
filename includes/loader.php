@@ -32,18 +32,12 @@ $__logo = htmlspecialchars($__base . '/assets/logo.png', ENT_QUOTES);
     animation:ibl-breathe 2s ease-in-out infinite;will-change:transform}
   .ibl-logo{width:78px;height:78px;object-fit:contain}
 
-  /* thin progress bar */
-  .ibl-bar{width:140px;height:3px;border-radius:3px;background:rgba(255,255,255,.22);overflow:hidden}
-  .ibl-bar::before{content:"";display:block;height:100%;width:40%;border-radius:3px;background:#fff;
-    animation:ibl-bar 1.3s ease-in-out infinite}
-
   @keyframes ibl-spin{to{transform:rotate(360deg)}}
   @keyframes ibl-breathe{
     0%,100%{transform:scale(.96);box-shadow:0 0 0 0 rgba(255,255,255,.30),0 8px 24px rgba(0,0,0,.25)}
     50%{transform:scale(1.04);box-shadow:0 0 0 14px rgba(255,255,255,0),0 8px 24px rgba(0,0,0,.25)}}
-  @keyframes ibl-bar{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}
 
-  @media (prefers-reduced-motion:reduce){.ibl-spin,.ibl-disc,.ibl-bar::before{animation:none}}
+  @media (prefers-reduced-motion:reduce){.ibl-spin,.ibl-disc{animation:none}}
 </style>
 <noscript><style>.ibl-loader{display:none!important}</style></noscript>
 
@@ -54,7 +48,6 @@ $__logo = htmlspecialchars($__base . '/assets/logo.png', ENT_QUOTES);
       <img class="ibl-logo" src="<?= $__logo ?>" alt="IBA College of Mindanao">
     </div>
   </div>
-  <div class="ibl-bar"></div>
 </div>
 
 <script>
