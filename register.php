@@ -213,6 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <link rel="icon" type="image/png" href="assets/logo.png?v=2">
 </head>
 <body>
+<?php include __DIR__ . '/includes/loader.php'; ?>
   <div class="split">
 
     <!-- LEFT: image panel -->

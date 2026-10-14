@@ -23,6 +23,7 @@ $unread     = $unread ?? 0;
   <link rel="icon" type="image/png" href="../assets/logo.png?v=2">
 </head>
 <body>
+<?php include __DIR__ . '/loader.php'; ?>
 <div class="app-shell">
   <aside class="sidebar">
 

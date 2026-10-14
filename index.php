@@ -1528,6 +1528,7 @@ footer {
 </head>
 
 <body>
+<?php include __DIR__ . '/includes/loader.php'; ?>
 
 <header class="nav">
 

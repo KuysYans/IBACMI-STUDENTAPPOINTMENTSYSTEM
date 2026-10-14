@@ -170,6 +170,7 @@ $only = in_array($only, ['registrar', 'cashier'], true) ? $only : '';
   <link rel="icon" type="image/png" href="assets/logo.png?v=2">
 </head>
 <body>
+<?php include __DIR__ . '/includes/loader.php'; ?>
 
 <header>
   <h1>IBA College of Mindanao · Queue</h1>
