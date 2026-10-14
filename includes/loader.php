@@ -25,28 +25,21 @@ $__logo = htmlspecialchars($__base . '/assets/logo.png', ENT_QUOTES);
     border:3px solid rgba(255,255,255,.18);border-top-color:#fff;
     animation:ibl-spin 1.1s linear infinite}
 
-  /* white circle holding the logo */
-  .ibl-disc{width:112px;height:112px;border-radius:50%;background:#fff;
-    display:flex;align-items:center;justify-content:center;
-    box-shadow:0 0 0 0 rgba(255,255,255,.35),0 8px 24px rgba(0,0,0,.25);
+  /* logo only (no background circle) */
+  .ibl-logo{width:96px;height:96px;object-fit:contain;
     animation:ibl-breathe 2s ease-in-out infinite;will-change:transform}
-  .ibl-logo{width:78px;height:78px;object-fit:contain}
 
   @keyframes ibl-spin{to{transform:rotate(360deg)}}
-  @keyframes ibl-breathe{
-    0%,100%{transform:scale(.96);box-shadow:0 0 0 0 rgba(255,255,255,.30),0 8px 24px rgba(0,0,0,.25)}
-    50%{transform:scale(1.04);box-shadow:0 0 0 14px rgba(255,255,255,0),0 8px 24px rgba(0,0,0,.25)}}
+  @keyframes ibl-breathe{0%,100%{transform:scale(.94)}50%{transform:scale(1.06)}}
 
-  @media (prefers-reduced-motion:reduce){.ibl-spin,.ibl-disc{animation:none}}
+  @media (prefers-reduced-motion:reduce){.ibl-spin,.ibl-logo{animation:none}}
 </style>
 <noscript><style>.ibl-loader{display:none!important}</style></noscript>
 
 <div class="ibl-loader" id="iblLoader" aria-hidden="true">
   <div class="ibl-wrap">
     <span class="ibl-spin"></span>
-    <div class="ibl-disc">
-      <img class="ibl-logo" src="<?= $__logo ?>" alt="IBA College of Mindanao">
-    </div>
+    <img class="ibl-logo" src="<?= $__logo ?>" alt="IBA College of Mindanao">
   </div>
 </div>
 
